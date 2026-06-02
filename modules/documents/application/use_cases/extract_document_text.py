@@ -2,6 +2,7 @@
 
 from uuid import uuid4
 from pathlib import Path
+from datetime import datetime
 
 from modules.documents.domain.entities.document import Document
 from modules.documents.domain.repositories.document_extractor_repository import (
@@ -22,8 +23,12 @@ class ExtractDocumentTextUseCase:
         text = self.extractor.extract_text(file_path)
 
         return Document(
-            id=str(uuid4()),
+            document_id=str(uuid4()),
             file_name=Path(file_path).name,
-            file_path=file_path,
-            content=text,
+            document_type="law",  # temporário, pois estamos testando com a lei
+            source_path=file_path,
+            text=text,
+            metadata={
+                "processed_at": datetime.now().isoformat(),
+            },
         )

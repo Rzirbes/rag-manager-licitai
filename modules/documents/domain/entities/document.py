@@ -1,11 +1,20 @@
 # modules/documents/domain/entities/document.py
 
 from dataclasses import dataclass
+from collections.abc import Mapping
+from typing import Any
 
 
 @dataclass
 class Document:
-    id: str
+    document_id: str
+
     file_name: str
-    file_path: str
-    content: str
+
+    document_type: str
+
+    source_path: str
+
+    text: str
+
+    metadata: Mapping[str, Any]
