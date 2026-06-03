@@ -25,7 +25,7 @@ class ExtractDocumentTextUseCase:
         return Document(
             document_id=str(uuid4()),
             file_name=Path(file_path).name,
-            document_type="law",  # temporário, pois estamos testando com a lei
+            document_type=None,  # temporário, pois estamos testando com a lei
             source_path=file_path,
             text=text,
             metadata={

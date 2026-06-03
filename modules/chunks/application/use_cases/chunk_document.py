@@ -2,8 +2,10 @@
 
 from modules.documents.domain.entities.document import Document
 from modules.chunks.domain.entities.document_chunk import DocumentChunk
+
 from modules.chunks.infra.chunkers.generic_chunker import GenericChunker
 from modules.chunks.infra.chunkers.law_chunker import LawChunker
+from modules.chunks.infra.chunkers.section_chunker import SectionChunker
 
 
 class ChunkDocumentUseCase:
@@ -11,9 +13,55 @@ class ChunkDocumentUseCase:
     def __init__(self):
         self.generic_chunker = GenericChunker()
         self.law_chunker = LawChunker()
+        self.section_chunker = SectionChunker()
+
+    def detect_document_type(self, text: str) -> str:
+        upper_text = text.upper()
+
+        if (
+            "EDITAL DE PREGÃO" in upper_text
+            or "EDITAL DE CONCORRÊNCIA" in upper_text
+            or "CHAMAMENTO PÚBLICO" in upper_text
+        ):
+            return "bid_notice"
+
+        if "CONTRATO N.º" in upper_text or "CONTRATO Nº" in upper_text:
+            return "contract"
+
+        if "ATA DE REGISTRO DE PREÇOS" in upper_text:
+            return "price_registry_minutes"
+
+        if "MODELO DE DECLARAÇÃO" in upper_text:
+            return "declaration_model"
+
+        if "ADITIVO" in upper_text:
+            return "addendum"
+
+        if "ART. 1º" in upper_text or "LEI Nº" in upper_text:
+            return "law"
+
+        return "generic"
 
     def execute(self, document: Document) -> list[DocumentChunk]:
-        if document.document_type == "law":
+
+        document_type = (
+            document.document_type
+            if document.document_type
+            else self.detect_document_type(document.text)
+        )
+
+        document.document_type = document_type
+
+        if document_type == "law":
             return self.law_chunker.chunk(document)
+
+        if document_type in [
+            "bid_notice",
+            "contract",
+            "price_registry_minutes",
+            "declaration_model",
+            "addendum",
+        ]:
+            return self.section_chunker.chunk(document)
 
         return self.generic_chunker.chunk(document)
