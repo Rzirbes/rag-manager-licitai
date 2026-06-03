@@ -31,4 +31,6 @@ class ExtractDocumentTextUseCase:
             metadata={
                 "processed_at": datetime.now().isoformat(),
             },
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
         )

@@ -23,6 +23,13 @@ document = extract_use_case.execute(
     "data/raw/INPDFViewer.pdf"
 )
 
+print("=" * 80)
+print(f"Data de Upload (created_at): {document.created_at}")
+print(f"Data de Atualização (updated_at): {document.updated_at}")
+print(f"Data da extração: {document.metadata.get('processed_at')}")
+print("=" * 80)
+print()
+
 chunks = chunk_use_case.execute(
     document
 )
