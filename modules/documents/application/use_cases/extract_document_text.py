@@ -20,7 +20,24 @@ class ExtractDocumentTextUseCase:
 
     def execute(self, file_path: str) -> Document:
 
+<<<<<<< Updated upstream
         text = self.extractor.extract_text(file_path)
+=======
+        # Tentativa de extração: vamos catar qualquer erro e lançar uma exceção de domínio com contexto
+        try:
+            text, extracted_metadata = self.extractor.extract_text(file_path)
+        except Exception as e:
+            from modules.documents.application.exceptions import DocumentExtractionError
+            raise DocumentExtractionError(f"Erro ao extrair texto do arquivo {file_path}: {e}") from e
+      
+
+        metadata = {
+            "processed_at": datetime.now().isoformat(),
+            "document_size": len(text),
+            "file_size_bytes": os.path.getsize(file_path),
+            **extracted_metadata,
+        }
+>>>>>>> Stashed changes
 
         return Document(
             document_id=str(uuid4()),

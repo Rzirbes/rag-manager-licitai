@@ -1,0 +1,3 @@
+
+class DocumentExtractionError(Exception):
+    pass
