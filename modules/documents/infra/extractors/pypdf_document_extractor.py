@@ -7,7 +7,7 @@ from modules.documents.domain.repositories.document_extractor_repository import 
 
 class PyPdfDocumentExtractor(DocumentExtractorRepository):
 
-    def extract_text(self, file_path: str) -> str:
+    def extract_text(self, file_path: str) -> tuple[str, dict]:
         reader = PdfReader(file_path)
 
         text = ""
@@ -18,4 +18,4 @@ class PyPdfDocumentExtractor(DocumentExtractorRepository):
             if page_text:
                 text += page_text + "\n"
 
-        return text
+        return text, {"page_count": len(reader.pages)}

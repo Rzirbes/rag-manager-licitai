@@ -19,8 +19,16 @@ class ExtractDocumentTextUseCase:
         self.extractor = extractor
 
     def execute(self, file_path: str) -> Document:
+        import os
 
-        text = self.extractor.extract_text(file_path)
+        text, extracted_metadata = self.extractor.extract_text(file_path)
+
+        metadata = {
+            "processed_at": datetime.now().isoformat(),
+            "document_size": len(text),
+            "file_size_bytes": os.path.getsize(file_path),
+            **extracted_metadata,
+        }
 
         return Document(
             document_id=str(uuid4()),
@@ -28,7 +36,5 @@ class ExtractDocumentTextUseCase:
             document_type=None,  # temporário, pois estamos testando com a lei
             source_path=file_path,
             text=text,
-            metadata={
-                "processed_at": datetime.now().isoformat(),
-            },
+            metadata=metadata,
         )
