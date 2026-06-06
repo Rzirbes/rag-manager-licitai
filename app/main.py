@@ -19,6 +19,7 @@ extract_use_case = ExtractDocumentTextUseCase(
 
 chunk_use_case = ChunkDocumentUseCase()
 
+<<<<<<< Updated upstream
 document = extract_use_case.execute(
     "data/raw/Edital-PE-Modelo.pdf"
 )
@@ -26,6 +27,29 @@ document = extract_use_case.execute(
 chunks = chunk_use_case.execute(
     document
 )
+=======
+arquivo_alvo = None
+
+'''
+Implementei esta mecanica pra ver os tratamentos de erros
+pois como tava retornando typerror e não passando pelas validações try catch 
+resolvi melhorar pra ficar mais facil de ver os tratamentos de erros
+Ai é só descomentar o arquivo que deseja testar
+'''
+arquivo_alvo = 'data/raw/Edital-PE-Modelo.pdf' # ver se passa na validação de erro
+#arquivo_alvo = 'data/raw/test_invalid_format.docx'
+
+if not arquivo_alvo:
+    print("Erro: Faltando documentos para extrair. Por favor, defina um arquivo alvo.")
+    exit(1)
+
+try:
+    document = extract_use_case.execute(arquivo_alvo)
+    chunks = chunk_use_case.execute(document)
+except DocumentExtractionError as e:
+    print(e)
+    exit(1)
+>>>>>>> Stashed changes
 
 
 print(f"Chunks gerados: {len(chunks)}")
