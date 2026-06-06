@@ -20,7 +20,7 @@ extract_use_case = ExtractDocumentTextUseCase(
 chunk_use_case = ChunkDocumentUseCase()
 
 document = extract_use_case.execute(
-    "data/raw/Edital-PE-Modelo.pdf"
+    "data/raw/Anexo-III-Minuta-de-Contrato-Concorrência.pdf"
 )
 
 chunks = chunk_use_case.execute(
