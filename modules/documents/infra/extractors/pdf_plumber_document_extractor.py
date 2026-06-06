@@ -8,6 +8,11 @@ from modules.documents.domain.repositories.document_extractor_repository import 
 class PdfPlumberDocumentExtractor(DocumentExtractorRepository):
 
     def extract_text(self, file_path: str) -> tuple[str, dict]:
+
+
+        if not file_path.lower().endswith(".pdf"):
+            raise ValueError("O arquivo não é um documento PDF (.pdf).")
+ 
         text = ""
         page_count = 0
 
@@ -19,4 +24,5 @@ class PdfPlumberDocumentExtractor(DocumentExtractorRepository):
                 if page_text:
                     text += page_text + "\n"
 
-        return text, {"page_count": page_count}
+
+        return text, {"page_count": len(pdf.pages)}

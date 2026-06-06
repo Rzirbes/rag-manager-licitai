@@ -9,6 +9,8 @@ from modules.documents.domain.repositories.document_extractor_repository import 
 class OcrDocumentExtractor(DocumentExtractorRepository):
 
     def extract_text(self, file_path: str) -> tuple[str, dict]:
+        if not file_path.lower().endswith(".pdf"):
+            raise ValueError("O arquivo não é um documento PDF (.pdf).")
         pages = convert_from_path(file_path, dpi=300)
 
         text = ""
@@ -25,4 +27,3 @@ class OcrDocumentExtractor(DocumentExtractorRepository):
                 text += page_text + "\n"
 
         return text, {"page_count": len(pages)}
-

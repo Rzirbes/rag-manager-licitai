@@ -106,10 +106,9 @@ class SectionChunker(BaseChunker):
 
     def _detect_section_header(self, line: str) -> dict[str, str | None] | None:
         clause_match = re.match(
-            r"^(CL[ÁA]USULA\s+[A-ZÇÃÕÉÍÓÚ]+)\s*[-–]?\s*(.*)$",
+            r"^(CL[ÁA]USULA\s+[A-ZÀ-Ú\s]+)\s*[-–]\s*(.+)$",
             line,
-            flags=re.IGNORECASE,
-        )
+)       
 
         if clause_match:
             return {

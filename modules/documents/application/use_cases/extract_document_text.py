@@ -3,6 +3,7 @@
 from uuid import uuid4
 from pathlib import Path
 from datetime import datetime
+import os
 
 from modules.documents.domain.entities.document import Document
 from modules.documents.domain.repositories.document_extractor_repository import (
@@ -22,6 +23,13 @@ class ExtractDocumentTextUseCase:
         import os
 
         text, extracted_metadata = self.extractor.extract_text(file_path)
+        # Tentativa de extração: vamos catar qualquer erro e lançar uma exceção de domínio com contexto
+        try:
+            text, extracted_metadata = self.extractor.extract_text(file_path)
+        except Exception as e:
+            from modules.documents.application.exceptions import DocumentExtractionError
+            raise DocumentExtractionError(f"Erro ao extrair texto do arquivo {file_path}: {e}") from e
+      
 
         metadata = {
             "processed_at": datetime.now().isoformat(),
