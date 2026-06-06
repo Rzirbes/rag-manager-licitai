@@ -56,25 +56,28 @@ class ChunkDocumentUseCase:
         return "generic"
 
     def execute(self, document: Document) -> list[DocumentChunk]:
+        try:
+            document_type = (
+                document.document_type
+                if document.document_type
+                else self.detect_document_type(document.text, document.file_name)
+            )
+            document.document_type = document_type
 
-        document_type = (
-            document.document_type
-            if document.document_type
-            else self.detect_document_type(document.text, document.file_name)
-        )
+            if document_type == "law":
+                return self.law_chunker.chunk(document)
 
-        document.document_type = document_type
+            if document_type in [
+                "bid_notice",
+                "contract",
+                "price_registry_minutes",
+                "declaration_model",
+                "addendum",
+            ]:
+                return self.section_chunker.chunk(document)
 
-        if document_type == "law":
-            return self.law_chunker.chunk(document)
-
-        if document_type in [
-            "bid_notice",
-            "contract",
-            "price_registry_minutes",
-            "declaration_model",
-            "addendum",
-        ]:
-            return self.section_chunker.chunk(document)
-
-        return self.generic_chunker.chunk(document)
+            return self.generic_chunker.chunk(document)
+            
+        except Exception as e:
+            from modules.chunks.application.exceptions import DocumentChunkingError
+            raise DocumentChunkingError(f"Erro ao fatiar (chunking) o documento {document.file_name}: {e}") from e
