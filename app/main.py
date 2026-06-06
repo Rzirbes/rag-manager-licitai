@@ -9,7 +9,6 @@ from modules.chunks.application.use_cases.chunk_document import (
 from modules.documents.infra.extractors.smart_document_extractor import (
     SmartDocumentExtractor,
 )
-from modules.documents.application.exceptions import DocumentExtractionError
 
 
 extractor = SmartDocumentExtractor()
@@ -20,13 +19,9 @@ extract_use_case = ExtractDocumentTextUseCase(
 
 chunk_use_case = ChunkDocumentUseCase()
 
-<<<<<<< Updated upstream
-document = extract_use_case.execute(
-    "data/raw/Edital-PE-Modelo.pdf"
-)
-=======
+from modules.documents.application.exceptions import DocumentExtractionError
+
 arquivo_alvo = None
->>>>>>> Stashed changes
 
 '''
 Implementei esta mecanica pra ver os tratamentos de erros
@@ -34,11 +29,8 @@ pois como tava retornando typerror e não passando pelas validações try catch
 resolvi melhorar pra ficar mais facil de ver os tratamentos de erros
 Ai é só descomentar o arquivo que deseja testar
 '''
-#arquivo_alvo = 'data/raw/test-word-document.docx' 
-# arquivo_alvo = 'data/raw/Edital-PE-Modelo.pdft' # ver se passa na validação de erro
-# arquivo_alvo = 'data/raw/test-csv-document.csv'
-# arquivo_alvo = 'data/raw/test-xlsx-document.xlsx'
-# arquivo_alvo = 'data/raw/test-odt-document.odt'
+arquivo_alvo = 'data/raw/Edital-PE-Modelo.pdf' # ver se passa na validação de erro
+#arquivo_alvo = 'data/raw/test_invalid_format.docx'
 
 if not arquivo_alvo:
     print("Erro: Faltando documentos para extrair. Por favor, defina um arquivo alvo.")

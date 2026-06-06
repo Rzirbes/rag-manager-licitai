@@ -10,3 +10,5 @@ pycparser==3.0
 pypdf==6.12.2
 pypdfium2==5.9.0
 pytesseract==0.3.13
+pytest
+pytest-mock
