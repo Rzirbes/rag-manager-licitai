@@ -19,15 +19,8 @@ extract_use_case = ExtractDocumentTextUseCase(
 
 chunk_use_case = ChunkDocumentUseCase()
 
-<<<<<<< Updated upstream
-document = extract_use_case.execute(
-    "data/raw/Edital-PE-Modelo.pdf"
-)
+from modules.documents.application.exceptions import DocumentExtractionError
 
-chunks = chunk_use_case.execute(
-    document
-)
-=======
 arquivo_alvo = None
 
 '''
@@ -49,7 +42,6 @@ try:
 except DocumentExtractionError as e:
     print(e)
     exit(1)
->>>>>>> Stashed changes
 
 
 print(f"Chunks gerados: {len(chunks)}")
