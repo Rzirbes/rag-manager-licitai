@@ -22,7 +22,6 @@ class ExtractDocumentTextUseCase:
     def execute(self, file_path: str) -> Document:
         import os
 
-        text, extracted_metadata = self.extractor.extract_text(file_path)
         # Tentativa de extração: vamos catar qualquer erro e lançar uma exceção de domínio com contexto
         try:
             text, extracted_metadata = self.extractor.extract_text(file_path)
