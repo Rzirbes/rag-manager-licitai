@@ -15,15 +15,24 @@ class ChunkDocumentUseCase:
         self.law_chunker = LawChunker()
         self.section_chunker = SectionChunker()
 
-    def detect_document_type(self, text: str) -> str:
+    def detect_document_type(self, text: str, file_name: str = "") -> str:
         upper_text = text.upper()
+        upper_file = file_name.upper()
 
-        if (
-            "EDITAL DE PREGÃO" in upper_text
-            or "EDITAL DE CONCORRÊNCIA" in upper_text
-            or "CHAMAMENTO PÚBLICO" in upper_text
-        ):
-            return "bid_notice"
+        if "MINUTA-DE-CONTRATO" in upper_file or "MINUTA DE CONTRATO" in upper_file:
+            return "contract"
+
+        if "ATA-DE-REGISTRO" in upper_file or "ATA DE REGISTRO" in upper_file:
+            return "price_registry_minutes"
+
+        if "DECLARA" in upper_file:
+            return "declaration_model"
+
+        if "REEQUIL" in upper_file or "RENOVA" in upper_file:
+            return "addendum"
+
+        if "ART. 1º" in upper_text or "LEI Nº" in upper_text:
+            return "law"
 
         if "CONTRATO N.º" in upper_text or "CONTRATO Nº" in upper_text:
             return "contract"
@@ -37,8 +46,12 @@ class ChunkDocumentUseCase:
         if "ADITIVO" in upper_text:
             return "addendum"
 
-        if "ART. 1º" in upper_text or "LEI Nº" in upper_text:
-            return "law"
+        if (
+            "EDITAL DE PREGÃO" in upper_text
+            or "EDITAL DE CONCORRÊNCIA" in upper_text
+            or "CHAMAMENTO PÚBLICO" in upper_text
+        ):
+            return "bid_notice"
 
         return "generic"
 
@@ -69,3 +82,25 @@ class ChunkDocumentUseCase:
         except Exception as e:
             from modules.chunks.application.exceptions import DocumentChunkingError
             raise DocumentChunkingError(f"Erro ao fatiar (chunking) o documento {document.file_name}: {e}") from e
+
+        document_type = (
+            document.document_type
+            if document.document_type
+            else self.detect_document_type(document.text, document.file_name)
+        )
+
+        document.document_type = document_type
+
+        if document_type == "law":
+            return self.law_chunker.chunk(document)
+
+        if document_type in [
+            "bid_notice",
+            "contract",
+            "price_registry_minutes",
+            "declaration_model",
+            "addendum",
+        ]:
+            return self.section_chunker.chunk(document)
+
+        return self.generic_chunker.chunk(document)
