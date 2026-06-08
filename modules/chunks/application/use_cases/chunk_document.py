@@ -62,22 +62,39 @@ class ChunkDocumentUseCase:
                 if document.document_type
                 else self.detect_document_type(document.text, document.file_name)
             )
+
             document.document_type = document_type
 
-            if document_type == "law":
-                return self.law_chunker.chunk(document)
+            chunks = []
 
-            if document_type in [
+            if document_type == "law":
+                chunks = self.law_chunker.chunk(document)
+
+            elif document_type in [
                 "bid_notice",
                 "contract",
                 "price_registry_minutes",
                 "declaration_model",
                 "addendum",
             ]:
-                return self.section_chunker.chunk(document)
+                chunks = self.section_chunker.chunk(document)
 
-            return self.generic_chunker.chunk(document)
-            
+            else:
+                chunks = self.generic_chunker.chunk(document)
+
+            # fallback de segurança
+            if not chunks:
+                print(
+                    f"[Aviso] Nenhum chunk gerado com chunker especializado para "
+                    f"{document_type}. Usando GenericChunker."
+                )
+                chunks = self.generic_chunker.chunk(document)
+
+            return chunks
+
         except Exception as e:
             from modules.chunks.application.exceptions import DocumentChunkingError
-            raise DocumentChunkingError(f"Erro ao fatiar (chunking) o documento {document.file_name}: {e}") from e
+
+            raise DocumentChunkingError(
+                f"Erro ao fatiar (chunking) o documento {document.file_name}: {e}"
+            ) from e

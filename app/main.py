@@ -22,14 +22,14 @@ extract_use_case = ExtractDocumentTextUseCase(
 chunk_use_case = ChunkDocumentUseCase()
 
 document = extract_use_case.execute(
-    'data/raw/test-word-document.docx' 
-    #'data/raw/Edital-PE-Modelo.pdf'
+    # 'data/raw/test-word-document.docx' 
+    # 'data/raw/Edital-PE-Modelo.pdf'
     #'data/raw/INPDFViewer.pdfr' # apenas teste de para ver o tratamento de erro caso esteja corrompido ou vazio
-    #'data/raw/INPDFViewer.pdf'
+    'data/raw/Anexo-III-Minuta-de-Contrato.pdf'
     #'data/raw/Nova_Engenharia_das_Contratações.pdf' # nenhum de nossos extratores conseguiu extrair os dados de um slide convertido em pdf
     #'data/raw/test-csv-document.csv'
     #'data/raw/test-xlsx-document.xlsx'
-    #'data/raw/test-odt-document.odt'
+    # 'data/raw/test-odt-document.odt'
 )
 
 chunks = chunk_use_case.execute(
