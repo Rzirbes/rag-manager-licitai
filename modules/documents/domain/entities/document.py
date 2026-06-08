@@ -16,5 +16,6 @@ class Document:
     source_path: str
 
     text: str
+    # armazenar
 
     metadata: Mapping[str, Any]

@@ -22,6 +22,18 @@ class GenericChunker(BaseChunker):
 
         while start < len(document.text):
             end = start + chunk_size
+           
+            # se não for o último chunk, recua o 'end' até o último espaço ou quebra de linha
+            if end < len(document.text):
+                last_space = document.text.rfind(' ', start, end)
+                last_newline = document.text.rfind('\n', start, end)
+                cut_point = max(last_space, last_newline)
+                
+                # se viu um separador válido, corta ali
+                if cut_point != -1 and cut_point > start:
+                    end = cut_point
+            
+
             content = document.text[start:end].strip()
 
             if content:
@@ -40,8 +52,26 @@ class GenericChunker(BaseChunker):
                         },
                     )
                 )
-
+            
             start += chunk_size - overlap
-            chunk_index += 1
 
+            # adicionei este bloco para faciltar, o fatiament de documentos genericos, já que antes cortavam no meio perdendo o sentido 
+            next_start = end - overlap
+            
+            # arruma o próximo início para não começar no meio de uma palavra
+            if next_start > start and next_start < len(document.text):
+                next_space = document.text.find(' ', next_start, end)
+                next_newline = document.text.find('\n', next_start, end)
+                
+                # pega o primeiro separador depois do next_start calculado
+                separators = [s for s in (next_space, next_newline) if s != -1]
+                if separators:
+                    start = min(separators) + 1
+                else:
+                    start = next_start
+            else:
+                start = end
+
+            chunk_index += 1
+    
         return chunks
