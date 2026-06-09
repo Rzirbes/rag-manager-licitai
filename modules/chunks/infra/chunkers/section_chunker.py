@@ -89,8 +89,9 @@ class SectionChunker(BaseChunker):
                 current_type = header["section_type"]
                 continue
 
-            if current_lines:
-                current_lines.append(line)
+            # antes só adicionava se current_lines já existisse
+            # agora guarda texto mesmo antes de detectar seção
+            current_lines.append(line)
 
         if current_lines:
             sections.append(
