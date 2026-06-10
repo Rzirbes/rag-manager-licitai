@@ -1,5 +1,5 @@
 from pypdf import PdfReader
-
+import json
 from modules.documents.domain.repositories.document_extractor_repository import (
     DocumentExtractorRepository,
 )
@@ -21,5 +21,4 @@ class PyPdfDocumentExtractor(DocumentExtractorRepository):
 
             if page_text:
                 text += page_text + "\n"
-
         return text, {"page_count": len(reader.pages)}

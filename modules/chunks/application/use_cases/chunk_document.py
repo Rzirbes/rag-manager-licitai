@@ -2,6 +2,8 @@
 
 from modules.documents.domain.entities.document import Document
 from modules.chunks.domain.entities.document_chunk import DocumentChunk
+import json
+from pathlib import Path
 
 from modules.chunks.infra.chunkers.generic_chunker import GenericChunker
 from modules.chunks.infra.chunkers.law_chunker import LawChunker
@@ -89,6 +91,22 @@ class ChunkDocumentUseCase:
                     f"{document_type}. Usando GenericChunker."
                 )
                 chunks = self.generic_chunker.chunk(document)
+
+            # Serializa e salva os chunks em data/processed
+            processed_dir = Path("data/processed")
+            processed_dir.mkdir(parents=True, exist_ok=True)
+            json_path = processed_dir / f"{document.file_name}_chunks.json"
+            
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump([
+                    {
+                        "chunk_id": chunk.chunk_id,
+                        "document_id": chunk.document_id,
+                        "chunk_index": chunk.chunk_index,
+                        "content": chunk.content,
+                        "metadata": chunk.metadata
+                    } for chunk in chunks
+                ], f, ensure_ascii=False, indent=4)
 
             return chunks
 
