@@ -1,3 +1,4 @@
+# pyrefly: ignore [missing-import]
 from docx import Document
 
 from modules.documents.domain.repositories.document_extractor_repository import (

@@ -1,0 +1,13 @@
+{
+    "document_id": "97f1a4f2-9428-46c0-a516-950a638b4a40",
+    "file_name": "test_valid.pdf",
+    "document_type": null,
+    "source_path": "C:\\Users\\Kauan Evaldt\\Documents\\Projetos\\ambiente_dev\\licitai-v1.0\\rag-engenharia-contratacoes-ai\\tests\\fixtures\\test_valid.pdf",
+    "text": "Sample extracted text.",
+    "metadata": {
+        "processed_at": "2026-06-08T21:56:46.781321",
+        "document_size": 22,
+        "file_size_bytes": 324314,
+        "page_count": 1
+    }
+}

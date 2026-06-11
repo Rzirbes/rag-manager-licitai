@@ -4,6 +4,7 @@ from uuid import uuid4
 from pathlib import Path
 from datetime import datetime
 import os
+import json
 
 from modules.documents.domain.entities.document import Document
 from modules.documents.domain.repositories.document_extractor_repository import (
@@ -37,7 +38,7 @@ class ExtractDocumentTextUseCase:
             **extracted_metadata,
         }
 
-        return Document(
+        document = Document(
             document_id=str(uuid4()),
             file_name=Path(file_path).name,
             document_type=None,  # temporário, pois estamos testando com a lei
@@ -45,3 +46,20 @@ class ExtractDocumentTextUseCase:
             text=text,
             metadata=metadata,
         )
+
+        # Serializa e salva o documento em data/interim
+        interim_dir = Path("data/interim")
+        interim_dir.mkdir(parents=True, exist_ok=True)
+        json_path = interim_dir / f"{document.file_name}.json"
+        
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "document_id": document.document_id,
+                "file_name": document.file_name,
+                "document_type": document.document_type,
+                "source_path": document.source_path,
+                "text": document.text,
+                "metadata": document.metadata
+            }, f, ensure_ascii=False, indent=4)
+
+        return document
