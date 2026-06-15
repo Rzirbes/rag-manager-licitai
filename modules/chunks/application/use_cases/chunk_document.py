@@ -1,9 +1,11 @@
 # modules/chunks/application/use_cases/chunk_document.py
 
+from pathlib import Path
+from uuid import uuid4
+import json
+
 from modules.documents.domain.entities.document import Document
 from modules.chunks.domain.entities.document_chunk import DocumentChunk
-import json
-from pathlib import Path
 
 from modules.chunks.infra.chunkers.generic_chunker import GenericChunker
 from modules.chunks.infra.chunkers.law_chunker import LawChunker
@@ -67,8 +69,6 @@ class ChunkDocumentUseCase:
 
             document.document_type = document_type
 
-            chunks = []
-
             if document_type == "law":
                 chunks = self.law_chunker.chunk(document)
 
@@ -84,7 +84,6 @@ class ChunkDocumentUseCase:
             else:
                 chunks = self.generic_chunker.chunk(document)
 
-            # fallback de segurança
             if not chunks:
                 print(
                     f"[Aviso] Nenhum chunk gerado com chunker especializado para "
@@ -92,21 +91,14 @@ class ChunkDocumentUseCase:
                 )
                 chunks = self.generic_chunker.chunk(document)
 
-            # Serializa e salva os chunks em data/processed
-            processed_dir = Path("data/processed")
-            processed_dir.mkdir(parents=True, exist_ok=True)
-            json_path = processed_dir / f"{document.file_name}_chunks.json"
-            
-            with open(json_path, "w", encoding="utf-8") as f:
-                json.dump([
-                    {
-                        "chunk_id": chunk.chunk_id,
-                        "document_id": chunk.document_id,
-                        "chunk_index": chunk.chunk_index,
-                        "content": chunk.content,
-                        "metadata": chunk.metadata
-                    } for chunk in chunks
-                ], f, ensure_ascii=False, indent=4)
+            table_chunks = self._create_table_chunks(
+                document=document,
+                start_index=len(chunks),
+            )
+
+            chunks.extend(table_chunks)
+
+            self._save_chunks(document, chunks)
 
             return chunks
 
@@ -116,3 +108,90 @@ class ChunkDocumentUseCase:
             raise DocumentChunkingError(
                 f"Erro ao fatiar (chunking) o documento {document.file_name}: {e}"
             ) from e
+
+    def _create_table_chunks(
+        self,
+        document: Document,
+        start_index: int = 0,
+    ) -> list[DocumentChunk]:
+        table_chunks: list[DocumentChunk] = []
+
+        tables_by_page = document.metadata.get("tables", [])
+
+        for page_data in tables_by_page:
+            page = page_data.get("page")
+            tables = page_data.get("tables", [])
+
+            for table_index, table in enumerate(tables):
+                content = self._table_to_text(table)
+
+                if not content:
+                    continue
+
+                table_chunks.append(
+                    DocumentChunk(
+                        document_id=document.document_id,
+                        chunk_id=str(uuid4()),
+                        chunk_index=start_index + len(table_chunks),
+                        content=content,
+                        metadata={
+                            "file_name": document.file_name,
+                            "document_type": document.document_type,
+                            "source_path": document.source_path,
+                            "chunk_type": "table",
+                            "page": page,
+                            "table_index": table_index,
+                            "processed_at": document.metadata.get("processed_at"),
+                            "document_size": document.metadata.get("document_size"),
+                            "file_size_bytes": document.metadata.get("file_size_bytes"),
+                            "page_count": document.metadata.get("page_count"),
+                        },
+                    )
+                )
+
+        return table_chunks
+
+    def _table_to_text(self, table: list[list[str | None]]) -> str:
+        rows = []
+
+        for row in table:
+            cells = [
+                str(cell).replace("\n", " ").strip()
+                for cell in row
+                if cell is not None and str(cell).strip()
+            ]
+
+            if cells:
+                rows.append(" | ".join(cells))
+
+        if not rows:
+            return ""
+
+        return "TABELA EXTRAÍDA:\n" + "\n".join(rows)
+
+    def _save_chunks(
+        self,
+        document: Document,
+        chunks: list[DocumentChunk],
+    ) -> None:
+        processed_dir = Path("data/processed")
+        processed_dir.mkdir(parents=True, exist_ok=True)
+
+        json_path = processed_dir / f"{Path(document.file_name).stem}_chunks.json"
+
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(
+                [
+                    {
+                        "chunk_id": chunk.chunk_id,
+                        "document_id": chunk.document_id,
+                        "chunk_index": chunk.chunk_index,
+                        "content": chunk.content,
+                        "metadata": chunk.metadata,
+                    }
+                    for chunk in chunks
+                ],
+                f,
+                ensure_ascii=False,
+                indent=4,
+            )

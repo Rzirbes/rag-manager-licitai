@@ -43,10 +43,11 @@ class SectionChunker(BaseChunker):
                             else f'{section_data["section_type"]}_part',
                             "section_title": section_data["title"],
                             "section_number": section_data["number"],
-                            "section_part": part_index
-                            if len(section_parts) > 1
-                            else None,
-                            **document.metadata,
+                            "section_part": part_index if len(section_parts) > 1 else None,
+                            "processed_at": document.metadata.get("processed_at"),
+                            "document_size": document.metadata.get("document_size"),
+                            "file_size_bytes": document.metadata.get("file_size_bytes"),
+                            "page_count": document.metadata.get("page_count"),
                         },
                     )
                 )

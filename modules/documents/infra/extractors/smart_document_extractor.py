@@ -32,8 +32,8 @@ class SmartDocumentExtractor(DocumentExtractorRepository):
 
     def __init__(self):
         self.extractors = [
-            PyPdfDocumentExtractor(),
             PdfPlumberDocumentExtractor(),
+            PyPdfDocumentExtractor(),
             OcrDocumentExtractor(),
             XlsxDocumentExtractor(),
             CsvDocumentExtractor(),
@@ -58,17 +58,4 @@ class SmartDocumentExtractor(DocumentExtractorRepository):
 
         # Se passou por todos os extratores, dispara a exceção
         raise ValueError("Nenhum extrator conseguiu extrair o texto do documento. O arquivo pode estar vazio ou corrompido.")
-        import os
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f"O arquivo {file_path} não foi encontrado.")
-
-        for extractor in self.extractors:
-            try:
-                text, metadata = extractor.extract_text(file_path)
-                if len(text.strip()) > 0:
-                    return text, metadata
-            except Exception as e:
-                print(f"[Aviso] Falha ao extrair com {extractor.__class__.__name__}: {e}")
-                continue
-
-        raise ValueError("Nenhum extrator conseguiu extrair o texto do arquivo.")
+        

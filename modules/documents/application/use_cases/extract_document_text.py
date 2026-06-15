@@ -21,7 +21,6 @@ class ExtractDocumentTextUseCase:
         self.extractor = extractor
 
     def execute(self, file_path: str) -> Document:
-        import os
 
         # Tentativa de extração: vamos catar qualquer erro e lançar uma exceção de domínio com contexto
         try:
