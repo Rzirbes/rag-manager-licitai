@@ -19,14 +19,26 @@ def valid_pdf_path():
     path = os.path.join(os.path.dirname(__file__), "../../../../fixtures/test_valid.pdf")
     return os.path.normpath(path)
 
-def test_execute_success(use_case, mock_extractor, valid_pdf_path):
+def test_execute_success(use_case, mock_extractor, valid_pdf_path, tmp_path, monkeypatch):
+    import pathlib
+    import json
+    
+    # interceptar Path para apontar "data/interim" para tmp_path
+    original_path = pathlib.Path
+    def mock_path(*args, **kwargs):
+        if args and args[0] == "data/interim":
+            return tmp_path / "data/interim"
+        return original_path(*args, **kwargs)
+        
+    monkeypatch.setattr("modules.documents.application.use_cases.extract_document_text.Path", mock_path)
+
     # configurar comportamento simulado
     mock_extractor.extract_text.return_value = ("Sample extracted text.", {"page_count": 1})
     
     # execução 
     document = use_case.execute(valid_pdf_path)
     
-    # verificação
+    # verificação de memória
     assert document is not None
     assert document.text == "Sample extracted text."
     assert "page_count" in document.metadata
@@ -35,6 +47,18 @@ def test_execute_success(use_case, mock_extractor, valid_pdf_path):
     assert document.metadata["document_size"] == len("Sample extracted text.")
     assert "file_size_bytes" in document.metadata
     assert "processed_at" in document.metadata
+
+    # verificação do arquivo salvo
+    json_file = tmp_path / "data/interim" / f"{document.file_name}.json"
+    assert json_file.exists(), "O arquivo JSON não foi criado na pasta interim!"
+    
+    with open(json_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+        
+    assert data["document_id"] == document.document_id
+    assert data["file_name"] == document.file_name
+    assert data["text"] == "Sample extracted text."
+    assert data["metadata"]["page_count"] == 1
 
 def test_execute_handles_extraction_error(use_case, mock_extractor, valid_pdf_path):
     # simular um erro do extrator
