@@ -6,9 +6,10 @@ from uuid import uuid4
 from modules.documents.domain.entities.document import Document
 from modules.chunks.domain.entities.document_chunk import DocumentChunk
 from modules.chunks.domain.chunkers.base_chunker import BaseChunker
+from modules.chunks.domain.services.token_count_service import TokenCountService
 
 
-MAX_ARTICLE_CHARS = 1800
+MAX_ARTICLE_TOKENS = 250
 
 
 class LawChunker(BaseChunker):
@@ -123,7 +124,9 @@ class LawChunker(BaseChunker):
         return articles
 
     def _split_large_article(self, article_text: str) -> list[str]:
-        if len(article_text) <= MAX_ARTICLE_CHARS:
+        token_service = TokenCountService()
+
+        if token_service.count_tokens(article_text) <= MAX_ARTICLE_TOKENS:
             return [article_text]
 
         header = self._extract_article_header(article_text)
@@ -143,13 +146,17 @@ class LawChunker(BaseChunker):
             if not block:
                 continue
 
-            if len(current_part) + len(block) > MAX_ARTICLE_CHARS:
+            if token_service.count_tokens(current_part + "\n" + block) > MAX_ARTICLE_TOKENS:
                 if current_part:
                     parts.append(current_part.strip())
-
-                current_part = block
+                    current_part = block
+                else:
+                    sub_pieces = token_service.split_text_by_tokens(block, max_tokens=MAX_ARTICLE_TOKENS)
+                    for sp in sub_pieces[:-1]:
+                        parts.append(sp)
+                    current_part = sub_pieces[-1]
             else:
-                current_part += "\n" + block
+                current_part += "\n" + block if current_part else block
 
         if current_part:
             parts.append(current_part.strip())

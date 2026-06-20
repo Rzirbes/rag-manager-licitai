@@ -12,6 +12,13 @@ from modules.documents.infra.extractors.smart_document_extractor import (
     SmartDocumentExtractor,
 )
 
+from modules.embedding.infra.providers.sentence_transformer_provider import (
+    SentenceTransformerProvider,
+)
+from modules.embedding.application.use_cases.embedding_convert import (
+    GenerateEmbeddingsUseCase,
+)
+
 
 extractor = SmartDocumentExtractor()
 
@@ -21,6 +28,8 @@ extract_use_case = ExtractDocumentTextUseCase(
 
 chunk_use_case = ChunkDocumentUseCase()
 
+embedding_provider = SentenceTransformerProvider()
+embedding_use_case = GenerateEmbeddingsUseCase(embedding_provider)
 
 from modules.documents.application.exceptions import DocumentExtractionError
 
@@ -39,9 +48,21 @@ if not arquivo_alvo:
     print("Erro: Faltando documentos para extrair. Por favor, defina um arquivo alvo.")
     exit(1)
 
+from pathlib import Path
+
 try:
+    print(f"Extraindo texto de {arquivo_alvo}...")
     document = extract_use_case.execute(arquivo_alvo)
+    
+    print("Fatiando o documento (chunking)...")
     chunks = chunk_use_case.execute(document)
+    
+
+    chunk_json_path = f"data/processed/{Path(document.file_name).stem}_chunks.json"
+    
+    print("Gerando os embeddings matemáticos...")
+    output_embedded_file = embedding_use_case.execute(chunk_json_path)
+    
 except DocumentExtractionError as e:
     print(e)
     exit(1)

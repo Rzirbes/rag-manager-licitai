@@ -16,3 +16,4 @@ python-docx
 pandas
 openpyxl
 odfpy
+sentence-transformers
