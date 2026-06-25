@@ -10,7 +10,7 @@ def mock_sentence_transformer():
         mock_instance = MagicMock()
         
         # simula o retorno de um vetor numpy para o método encode
-        def fake_encode(text_or_texts):
+        def fake_encode(text_or_texts, **kwargs):
             if isinstance(text_or_texts, str):
                 return np.array([0.1, 0.2, 0.3])
             return np.array([[0.1, 0.2, 0.3] for _ in text_or_texts])

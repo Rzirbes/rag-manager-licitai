@@ -6,6 +6,7 @@ from unittest.mock import MagicMock
 
 from modules.embedding.application.use_cases.embedding_convert import GenerateEmbeddingsUseCase
 from modules.embedding.domain.repositories.embedding_provider_repository import EmbeddingProviderRepository
+from modules.embedding.domain.repositories.vector_db_repository import VectorDbRepository
 
 @pytest.fixture
 def mock_provider():
@@ -15,8 +16,12 @@ def mock_provider():
     return provider
 
 @pytest.fixture
-def use_case(mock_provider):
-    return GenerateEmbeddingsUseCase(provider=mock_provider)
+def mock_vector_db():
+    return MagicMock(spec=VectorDbRepository)
+
+@pytest.fixture
+def use_case(mock_provider, mock_vector_db):
+    return GenerateEmbeddingsUseCase(provider=mock_provider, vector_db=mock_vector_db)
 
 def test_generate_embeddings_saves_json(use_case, tmp_path, monkeypatch):
     # 1. Preparar a pasta "data/processed" falsa no tmp_path com um JSON de chunks simulado

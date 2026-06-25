@@ -1,0 +1,13 @@
+{
+    "document_id": "0e07d0dd-8c04-444d-940b-e4c982f0f440",
+    "file_name": "test_valid.pdf",
+    "document_type": null,
+    "source_path": "C:\\Users\\Kauan Evaldt\\Documents\\Projetos\\ambiente_dev\\rag-engenharia-contratacoes-ai\\tests\\fixtures\\test_valid.pdf",
+    "text": "Sample extracted text.",
+    "metadata": {
+        "processed_at": "2026-06-25T10:48:06.943995",
+        "document_size": 22,
+        "file_size_bytes": 324314,
+        "page_count": 1
+    }
+}
