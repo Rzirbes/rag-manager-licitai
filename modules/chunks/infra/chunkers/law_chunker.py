@@ -28,32 +28,34 @@ class LawChunker(BaseChunker):
             article_parts = self._split_large_article(article_text)
 
             for part_index, part_content in enumerate(article_parts, start=1):
-                chunks.append(
-                    DocumentChunk(
-                        document_id=document.document_id,
-                        chunk_id=str(uuid4()),
-                        content=part_content.strip(),
-                        chunk_index=chunk_index,
-                        metadata={
-                            "file_name": document.file_name,
-                            "document_type": document.document_type,
-                            "source_path": document.source_path,
-                            "section_type": "article"
-                            if len(article_parts) == 1
-                            else "article_part",
-                            "article": article_number,
-                            "article_part": part_index
-                            if len(article_parts) > 1
-                            else None,
-                            "title": article_data.get("title"),
-                            "chapter": article_data.get("chapter"),
-                            "section": article_data.get("section"),
-                            **document.metadata,
-                        },
+                clean_content = part_content.strip()
+                if clean_content:
+                    chunks.append(
+                        DocumentChunk(
+                            document_id=document.document_id,
+                            chunk_id=str(uuid4()),
+                            content=clean_content,
+                            chunk_index=chunk_index,
+                            metadata={
+                                "file_name": document.file_name,
+                                "document_type": document.document_type,
+                                "source_path": document.source_path,
+                                "section_type": "article"
+                                if len(article_parts) == 1
+                                else "article_part",
+                                "article": article_number,
+                                "article_part": part_index
+                                if len(article_parts) > 1
+                                else None,
+                                "title": article_data.get("title"),
+                                "chapter": article_data.get("chapter"),
+                                "section": article_data.get("section"),
+                                **document.metadata,
+                            },
+                        )
                     )
-                )
 
-                chunk_index += 1
+                    chunk_index += 1
 
         return chunks
 

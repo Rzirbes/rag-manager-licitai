@@ -29,31 +29,33 @@ class SectionChunker(BaseChunker):
             section_parts = self._split_large_section(section_text)
 
             for part_index, part_content in enumerate(section_parts, start=1):
-                chunks.append(
-                    DocumentChunk(
-                        document_id=document.document_id,
-                        chunk_id=str(uuid4()),
-                        content=part_content.strip(),
-                        chunk_index=chunk_index,
-                        metadata={
-                            "file_name": document.file_name,
-                            "document_type": document.document_type,
-                            "source_path": document.source_path,
-                            "section_type": section_data["section_type"]
-                            if len(section_parts) == 1
-                            else f'{section_data["section_type"]}_part',
-                            "section_title": section_data["title"],
-                            "section_number": section_data["number"],
-                            "section_part": part_index if len(section_parts) > 1 else None,
-                            "processed_at": document.metadata.get("processed_at"),
-                            "document_size": document.metadata.get("document_size"),
-                            "file_size_bytes": document.metadata.get("file_size_bytes"),
-                            "page_count": document.metadata.get("page_count"),
-                        },
+                clean_content = part_content.strip()
+                if clean_content:
+                    chunks.append(
+                        DocumentChunk(
+                            document_id=document.document_id,
+                            chunk_id=str(uuid4()),
+                            content=clean_content,
+                            chunk_index=chunk_index,
+                            metadata={
+                                "file_name": document.file_name,
+                                "document_type": document.document_type,
+                                "source_path": document.source_path,
+                                "section_type": section_data["section_type"]
+                                if len(section_parts) == 1
+                                else f'{section_data["section_type"]}_part',
+                                "section_title": section_data["title"],
+                                "section_number": section_data["number"],
+                                "section_part": part_index if len(section_parts) > 1 else None,
+                                "processed_at": document.metadata.get("processed_at"),
+                                "document_size": document.metadata.get("document_size"),
+                                "file_size_bytes": document.metadata.get("file_size_bytes"),
+                                "page_count": document.metadata.get("page_count"),
+                            },
+                        )
                     )
-                )
 
-                chunk_index += 1
+                    chunk_index += 1
 
         return chunks
 

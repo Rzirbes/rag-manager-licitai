@@ -3,6 +3,7 @@
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
+.pytest_cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -124,6 +125,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.vscode
 .env
 .venv
 env/
@@ -174,3 +176,10 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+# files que uso (kauan)
+up-requirements-file.bat
+commit-develop-git.bat
+
+# chromadb folder
+chroma_db/

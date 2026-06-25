@@ -11,9 +11,9 @@ class SentenceTransformerProvider(EmbeddingProviderRepository):
         self.model = SentenceTransformer(model_name)
 
     def generate_embedding(self, text: str) -> list[float]:
-        vector = self.model.encode(text)
+        vector = self.model.encode(text, normalize_embeddings=True)
         return vector.tolist()
 
     def generate_embeddings_batch(self, texts: list[str]) -> list[list[float]]:
-        vectors = self.model.encode(texts)
+        vectors = self.model.encode(texts, normalize_embeddings=True)
         return vectors.tolist()

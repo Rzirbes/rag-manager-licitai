@@ -40,7 +40,9 @@ class TokenCountService:
             # Se for o fim do texto, apenas adiciona o que restou
             if end == len(tokens):
                 chunk_tokens = tokens[start:end]
-                chunks.append(self._tokenizer.decode(chunk_tokens).strip())
+                decoded_text = self._tokenizer.decode(chunk_tokens).strip()
+                if decoded_text:
+                    chunks.append(decoded_text)
                 break
                 
             # Descodifica o pedaço até o limite máximo
@@ -63,6 +65,8 @@ class TokenCountService:
                 # Corte forçado
                 start += max_tokens - overlap
                 
-            chunks.append(chunk_text.strip())
+            clean_chunk = chunk_text.strip()
+            if clean_chunk:
+                chunks.append(clean_chunk)
 
         return chunks
