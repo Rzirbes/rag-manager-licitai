@@ -1,1 +1,1 @@
-# finance-manager
+# rag-manager-licitai
